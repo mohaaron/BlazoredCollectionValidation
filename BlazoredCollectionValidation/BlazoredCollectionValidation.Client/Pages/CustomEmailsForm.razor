@@ -1,0 +1,56 @@
+﻿@page "/custom-emails-form"
+@using BlazoredCollectionValidation.Client.Models
+
+<h3>Validate Email Collection</h3>
+
+<EditForm EditContext="editContext" OnValidSubmit="ValidSubmit">
+    <Blazored.FluentValidation.FluentValidationValidator Options="@(options => options.IncludeRuleSets(nameof(Customer)))" />
+
+    <div class="form-group">
+        <label for="name">FirstName</label>
+        <InputText @bind-Value="customer.FirstName" class="form-control" />
+        <ValidationMessage For="@(() => customer.FirstName)" />
+    
+        <label for="name">LastName</label>
+        <InputText @bind-Value="customer.LastName" class="form-control" />
+        <ValidationMessage For="@(() => customer.LastName)" />
+    </div>
+
+    <div class="form-group">
+        <div>
+            <button type="button" class="btn btn-primary" @onclick="() => customer.Emails.Add(new Email())">Add Email</button>
+        </div>
+        @foreach(var email in customer.Emails)
+        {
+                <label for="email">Email</label>
+                <InputText @bind-Value="email.Value" class="form-control" />
+                <ValidationMessage For="@(() => email.Value)" />
+        }
+    </div>
+
+    <div>
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+</EditForm>
+
+@code {
+    private Customer customer = new();
+    private EditContext editContext = null!;
+
+    protected override void OnInitialized()
+    {
+        editContext = new(customer);
+    }
+
+    private void ValidSubmit()
+    {
+        bool isValid = editContext.Validate();
+        if (!isValid)
+        {
+            Console.WriteLine("Invalid Submit");
+            return;
+        }
+
+        Console.WriteLine("Valid Submit");
+    }
+}
